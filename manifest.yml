@@ -1,0 +1,18 @@
+modules:
+  macro:
+    - key: text-to-speech-translate-confluence-app-hello-world-macro
+      resource: main
+      render: native
+      resolver:
+        function: resolver
+      title: text-to-speech-translate-confluence-app
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs20.x
+  id: ari:cloud:ecosystem::app/4058887a-6bac-43fa-b8bf-5f89e74374c8
