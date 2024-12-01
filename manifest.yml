@@ -23,6 +23,8 @@ permissions:
     - 'read:confluence-content.all'
     - 'read:page:confluence'
     - 'read:content.metadata:confluence'
+    - 'write:confluence-file'
+    - 'read:confluence-space.summary'
   external:
     fetch:
       backend:

@@ -2,6 +2,7 @@ import Resolver from '@forge/resolver';
 import api, { route } from '@forge/api';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import path from 'path';
+import FormData from 'form-data';
 
 const API_KEY = process.env.GOOGLE_CLOUD_API_KEY;
 const KEY_FILE = process.env.KEY_FILE;
@@ -52,12 +53,37 @@ resolver.define('translateAndSpeak', async ({ context, payload }) => {
         audioConfig: { audioEncoding: 'MP3' },
     });
   
-    // Convert audio content to base64
-    const audioBase64 = Buffer.from(audioResponse.audioContent).toString('base64');
+    // Upload audio file as attachment
+    const fileName = `${pageId}_${targetLanguage}_${Date.now()}.mp3`;
+    const formData = new FormData();
+    formData.append('file', Buffer.from(audioResponse.audioContent), {
+        filename: fileName,
+        contentType: 'audio/mp3',
+    });
+    const attachmentResponse = await api.asApp().requestConfluence(route`/wiki/rest/api/content/${pageId}/child/attachment`, {
+        method: 'POST',
+        headers: {
+            'X-Atlassian-Token': 'no-check',
+            ...formData.getHeaders(),
+        },
+        body: formData,
+    });
+
+    if (!attachmentResponse.ok) {
+        console.error('Attachment upload failed:', await attachmentResponse.text());
+        throw new Error(`Failed to upload audio attachment: ${attachmentResponse.status} ${attachmentResponse.statusText}`);
+    }
+
+    const attachmentData = await attachmentResponse.json();
+    const relativeAudioUrl = attachmentData.results[0]._links.download;
+
+    // Construct full audio URL
+    const ATLASSIAN_SITE  = process.env.ATLASSIAN_SITE;
+    const audioUrl = `https://${ATLASSIAN_SITE}/wiki${relativeAudioUrl}`;
 
     return {
         translatedText: translatedText,
-        audioBase64: audioBase64
+        audioUrl: audioUrl
     };
 });
 
