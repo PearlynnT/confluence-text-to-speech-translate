@@ -50,3 +50,6 @@ Thumbs.db
 
 
 /.forge/
+
+# Google JSON Key
+confluence-tts-translate.json

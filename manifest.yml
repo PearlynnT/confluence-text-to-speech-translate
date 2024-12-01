@@ -16,3 +16,15 @@ app:
   runtime:
     name: nodejs20.x
   id: ari:cloud:ecosystem::app/4058887a-6bac-43fa-b8bf-5f89e74374c8
+permissions:
+  scopes:
+    - 'read:confluence-content.summary'
+    - 'read:confluence-props'
+    - 'read:confluence-content.all'
+    - 'read:page:confluence'
+    - 'read:content.metadata:confluence'
+  external:
+    fetch:
+      backend:
+        - 'https://translation.googleapis.com'
+        - 'https://texttospeech.googleapis.com'
